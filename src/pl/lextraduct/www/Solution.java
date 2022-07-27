@@ -59,7 +59,11 @@ public class Solution {
         String[] interimUrlBis = new String[interimUrl.length - 1];
 
         for (int i = 1; i < interimUrl.length; i++) {
-            if (interimUrl[i].length() > 30) interimUrl[i] = formatLongUrl(url);
+            if (interimUrl[i].length() > 30) {
+                interimUrl[i] = formatLongUrl(interimUrl[i]);
+            } else if (interimUrl[i].length() <= 30 && interimUrl[i].contains("-")) {
+                interimUrl[i] = formatShortUrl(interimUrl[i]);
+            }
         }
 
         if (interimUrl[interimUrl.length - 1].contains("index")) {
@@ -79,4 +83,7 @@ public class Solution {
         return url;
     }
 
+    public static String formatShortUrl(String url) {
+        return url.toUpperCase().replaceAll("-", " ");
+    }
 }
