@@ -1,19 +1,25 @@
 package pl.lextraduct.www;
 
-import java.util.function.Function;
+//import java.util.ArrayList;
+//import java.util.Arrays;
+//import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class Solution {
 
     public static void main(String[] args) {
 
-        String url0 = "mysite.com/pictures/holidays.html";
-        String url1 = "www.codewars.com/users/GiacomoSorbi";
-        String url2 = "www.microsoft.com/docs/index.htm";
-        String url3 = "mysite.com/very-long-url-to-make-a-silly-yet-meaningful-example/example.htm";
-        String url4 = "www.very-long-site_name-to-make-a-silly-yet-meaningful-example.com/users/giacomo-sorbi";
+//        String url0 = "mysite.com/pictures/holidays.html";
+//        String url1 = "www.codewars.com/users/GiacomoSorbi";
+//        String url2 = "www.microsoft.com/docs/index.htm";
+//        String url3 = "mysite.com/very-long-url-to-make-a-silly-yet-meaningful-example/example.htm";
+//        String url4 = "www.very-long-site_name-to-make-a-silly-yet-meaningful-example.com/users/giacomo-sorbi-_it";
+//        String url5 = "https://www.linkedin.com/in/giacomosorbi";
+        String url6 = "www.lexraduct.pl/";
         String separator = " : ";
 
-        String[] arrOfUrls = {url0, url1, url2, url3, url4};
+//        String[] arrOfUrls = {url0, url1, url2, url3, url4, url5, url6};
+        String[] arrOfUrls = {url6};
 
         for (String s : arrOfUrls) {
             System.out.println(generate_bc(s, separator));
@@ -24,9 +30,9 @@ public class Solution {
 
         String home = "<a href=\"/\">HOME</a>";
         String[] urlSection = getUrlArray(url);
-        String[] urlArray = new String[urlSection.length];
+        String[] urlArray = getUrlArray(url);
 
-        Function<String, String> urlFormatter = text -> {
+        UnaryOperator<String> urlFormatter = text -> {
 
             String pathSequence = "";
 
@@ -42,9 +48,17 @@ public class Solution {
 
         String finalUrl;
 
-        if (urlSection.contains(".") || isTheLastElement(urlSection, urlArray, urlArray.length)) {
-            finalUrl = "<span class=\"active\">" + urlSection.replaceAll("\\.(\\w*)", "").toUpperCase() + "</span>";
-        } else finalUrl = "<a href=\"/" + urlSection + "/\">" + urlSection.toUpperCase() + "</a>";
+        if (isAnchorContained(urlSection) || isTheLastElement(urlSection, urlArray, urlArray.length)) {
+            finalUrl = "<span class=\"active\">" + urlSection.toUpperCase().replaceAll("\\.(\\w*)|\\?(\\w*)|#(\\w*)" +
+                            "|\\$(\\w*)|%(\\w*)|&(\\w*)|=(\\w*)", "").replaceAll("[-_]", " ") + "</span>";
+//        } else if (urlSection.length() < 2) {
+//          finalUrl =
+        } else if (urlSection.length() > 30) {
+            finalUrl = "<a href=\"/" + urlSection + "/\">" + formatLongUrl(urlSection).toUpperCase() + "</a>";
+        } else {
+            finalUrl = "<a href=\"/" + urlSection + "/\">" + formatMediumSizeUrl(urlSection).toUpperCase() + "</a>";
+        }
+//            finalUrl = "<a href=\"/" + urlSection + "/\">" + urlSection.toUpperCase() + "</a>";
 
         return finalUrl;
     }
@@ -55,16 +69,8 @@ public class Solution {
 
     public static String[] getUrlArray(String url) {
 
-        String[] interimUrl = url.split("/");
+        String[] interimUrl = url.replaceFirst("//", "").split("/");
         String[] interimUrlBis = new String[interimUrl.length - 1];
-
-        for (int i = 1; i < interimUrl.length; i++) {
-            if (interimUrl[i].length() > 30) {
-                interimUrl[i] = formatLongUrl(interimUrl[i]);
-            } else if (interimUrl[i].length() <= 30 && interimUrl[i].contains("-")) {
-                interimUrl[i] = formatShortUrl(interimUrl[i]);
-            }
-        }
 
         if (interimUrl[interimUrl.length - 1].contains("index")) {
             System.arraycopy(interimUrl, 0, interimUrlBis, 0, interimUrl.length - 1);
@@ -72,18 +78,43 @@ public class Solution {
         }
         return interimUrl;
     }
+
     public static String formatLongUrl(String url) {
 
-        String[] wordsToIgnore = {"\\bthe\\b","\\bof\\b","\\bin\\b","\\bfrom\\b","\\bby\\b","\\bwith\\b","\\band\\b",
-                "\\bor\\b", "\\bfor\\b", "\\bto\\b", "\\bat\\b", "\\ba\\b"};
+        String[] wordsToIgnore = {"\\bthe\\b", "\\bof\\b", "\\bin\\b", "\\bfrom\\b", "\\bby\\b", "\\bwith\\b",
+                "\\band\\b", "\\bor\\b", "\\bfor\\b", "\\bto\\b", "\\bat\\b", "\\ba\\b"};
 
-            for (int j = 0; j < wordsToIgnore.length; j++) {
-                url = url.replaceAll(wordsToIgnore[j], "");
+        for (int j = 0; j < wordsToIgnore.length; j++) {
+            url = url.replaceAll(wordsToIgnore[j], "");
+        }
+
+        String[] interimUrl = url.split("[-_]");
+        StringBuilder concatenatedUrl = new StringBuilder();
+
+
+        for (int i = 0; i < interimUrl.length; i++) {
+            try {
+                concatenatedUrl.append(interimUrl[i].toUpperCase().charAt(0));
+            } catch (StringIndexOutOfBoundsException e) {
+                concatenatedUrl.append("");
             }
-        return url;
+        }
+
+        return concatenatedUrl.toString();
     }
 
-    public static String formatShortUrl(String url) {
-        return url.toUpperCase().replaceAll("-", " ");
+    public static String formatMediumSizeUrl(String url) {
+        return url.replaceAll("[-_ ]", " ");
+    }
+
+    public static boolean isAnchorContained(String urlSection) {
+        String[] anchors = {".", "?", "#", "$", "%", "&", "="};
+
+        for (String anchor : anchors) {
+            if (urlSection.contains(anchor)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
