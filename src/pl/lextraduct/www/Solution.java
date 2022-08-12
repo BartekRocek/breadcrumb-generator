@@ -45,7 +45,8 @@ public class Solution {
             String pathSequence = "";
 
             for (int i = 1; i < urlSection.length; i++) {
-                pathSequence = pathSequence.concat(separator + incorporateUrlSection(urlSection[i], urlArray));
+                pathSequence = pathSequence.concat(separator + incorporateUrlSection(urlSection[i], urlArray)); //what about asding urlSection[i-1]
+// to add aections in more than 3 section urls
             }
             return home + pathSequence;
         };
