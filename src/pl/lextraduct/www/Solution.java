@@ -5,10 +5,29 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Solution {
+
+    static class UrlStructured {
+
+        String url;
+
+        public UrlStructured(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url += url;
+        }
+    }
+
+    static String urlAddress = "";
+    static UrlStructured urlStructured = new UrlStructured(urlAddress);
+
 
     public static void main(String[] args) {
 
@@ -20,25 +39,27 @@ public class Solution {
         String url5 = "https://www.linkedin.com/in/giacomosorbi";
         String url6 = "www.lextraduct.pl/";
         String url7 = "www.lextraduct.pl/OF A BLADDER DIPLOMATIC KAMEHAMEHA SKIN WITH/";
-        String url8 = "https://www.qpa.com/subOne/subTwo/subThree/giacomosorbi";
+        String url8 = "https://www.qpa.com/subOne/subTwo/subThree/subFour/giacomosorbi";
         String separator = " : ";
 
         String[] arrOfUrls = {url0, url1, url2, url3, url4, url5, url6, url7, url8};
-//        String[] arrOfUrls = {url6};
 
+        int counter = 1;
         for (String s : arrOfUrls) {
-            System.out.println(generate_bc(s, separator));
+            System.out.println(counter++ + ": " + generate_bc(s, separator));
         }
     }
 
     public static String generate_bc(String url, String separator) {
 
         Predicate<String[]> isTheElementTheOnlyElement = x -> x.length == 1;
+        Predicate<String[]> isComposedOfMoreThenThreeSections = x -> x.length > 3;
 
         String[] urlSection = getUrlArray(url);
         String[] urlArray = getUrlArray(url);
 
-        String home = isTheElementTheOnlyElement.test(urlSection) ? "<span class=\"active\">HOME</span>" : "<a \"href=\"/\">HOME</a>";
+        String home = isTheElementTheOnlyElement.test(urlSection) ? "<span class=\"active\">HOME</span>" : "<a \"href" +
+                "=\"/\">HOME</a>";
 
         UnaryOperator<String> urlFormatter = text -> {
 
@@ -49,6 +70,14 @@ public class Solution {
             }
             return home + pathSequence;
         };
+
+        //This doesn't work
+        if (isComposedOfMoreThenThreeSections.test(urlSection)) {
+            urlStructured.setUrl(urlFormatter.apply(url));
+            urlAddress = urlAddress.concat(urlStructured.getUrl());
+            return urlAddress;
+        }
+
         return urlFormatter.apply(url);
     }
 
@@ -84,8 +113,6 @@ public class Solution {
 
         String[] interimUrl = url.replaceFirst("//", "").split("/");
         String[] interimUrlBis = new String[interimUrl.length - 1];
-
-
 
         if (interimUrl[interimUrl.length - 1].contains("index")) {
             System.arraycopy(interimUrl, 0, interimUrlBis, 0, interimUrl.length - 1);
