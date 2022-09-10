@@ -16,14 +16,14 @@ class SolutionTest {
                 "https://www.linkedin.com/in/giacomosorbi"};
 
         String[] urlDesired = new String[] {
-                "<a href=\"/\">HOME</a> : <a href=\"/pictures/\">PICTURES</a> : <span class=\"active\">HOLIDAYS</span>",
+                "<a \"href=\"/\">HOME</a> : <a href=\"/pictures/\">PICTURES</a> : <span class=\"active\">HOLIDAYS</span>",
                 "<span class=\"active\">HOME</span>",
-                "<a href=\"/in/\">IN</a> : <span class=\"active\">GIACOMOSORBI</span>"
+                "<a \"href=\"/\">HOME</a> : <a \"href=\"/in/\">IN</a> : <span class=\"active\">GIACOMOSORBI</span>"
         };
 
         for (int i = 0; i < 3; i++) {
 
-            String actualUrl = Solution.generate_bc(urlProvided[i], ":");
+            String actualUrl = Solution.generate_bc(urlProvided[i], " : ");
 
             assertEquals(urlDesired[i], actualUrl);
 
